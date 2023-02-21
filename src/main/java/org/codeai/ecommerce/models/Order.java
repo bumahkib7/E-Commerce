@@ -9,7 +9,9 @@ import org.codeai.ecommerce.Enums.OrderStatus;
 import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -22,7 +24,7 @@ public class Order {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "order_id", nullable = false, updatable = false)
-  private final long serialVersionUID = 55L;
+  private Long id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id")
@@ -34,7 +36,7 @@ public class Order {
   private Date date;
 
   @Column(nullable = false)
-  private double total;
+  private BigDecimal total;
 
   @Column(nullable = false)
   private int quantity;
@@ -54,11 +56,19 @@ public class Order {
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @ToString.Exclude
   private List<OrderItem> orderItems = new ArrayList<>();
+  @Enumerated(EnumType.STRING)
+  private OrderStatus orderStatus;
+
+  @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinTable(name = "orders_shipping_address",
+    joinColumns = @JoinColumn(name = "order_order_id"),
+    inverseJoinColumns = @JoinColumn(name = "shipping_address_id"))
+  private ShippingAddress shippingAddress;
 
   public Order(Customer customer, List<OrderItem> orderItems, BigDecimal totalPrice) {
     this.customer = customer;
     this.orderItems = orderItems;
-    this.total = totalPrice.doubleValue();
+    this.total = totalPrice;
   }
 
 

@@ -1,6 +1,8 @@
 package org.codeai.ecommerce.service;
 
 import lombok.SneakyThrows;
+import org.codeai.ecommerce.Enums.OrderStatus;
+import org.codeai.ecommerce.exceptions.OrderNotFoundException;
 import org.codeai.ecommerce.exceptions.OrderValidationException;
 import org.codeai.ecommerce.models.Order;
 import org.codeai.ecommerce.models.OrderItem;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +22,7 @@ public class OrderService {
 
   private final OrderRepository orderRepository;
   private final ProductService productService;
+
 
   public OrderService(OrderRepository orderRepository, ProductService productService) {
     this.orderRepository = orderRepository;
@@ -81,10 +85,41 @@ public class OrderService {
     return orderRepository.findAll();
   }
 
-
-  private void validateOrder(Order order) throws OrderValidationException {
-    OrderValidator validator = new OrderValidator(orderRepository);
-    validator.validate(order);
+  @SneakyThrows(OrderValidationException.class)
+  public Order getOrderById(Long id) {
+    validateOrder(orderRepository.findById(id).orElse(null));
+    return orderRepository.findById(id).orElse(null);
   }
 
+  public void updateOrderStatus(long orderId, OrderStatus newStatus) throws OrderCannotBeUpdatedException {
+    Order order = orderRepository.findById(orderId)
+      .orElseThrow(() -> new OrderNotFoundException(orderId));
+    if (order.getStatus() == OrderStatus.CANCELLED) {
+      throw new OrderCannotBeUpdatedException("Cannot update a cancelled order");
+    }
+    order.setStatus(newStatus);
+    orderRepository.save(order);
+  }
+
+
+  @SneakyThrows(OrderValidationException.class)
+  private void validateOrder(Order order) {
+    OrderValidator validator = new OrderValidator(
+      (ProductService) orderRepository.findAll().stream()
+        .filter(o -> !Objects.equals(o.getId(), order.getId()))
+        .collect(Collectors.toList())
+    );
+    if (!validator.isValid(order)) {
+      throw new OrderValidationException(validator.getErrors(
+        order.getOrderItems().stream()
+          .map(OrderItem::getProduct)
+          .collect(Collectors.toList()).add(order.getCustomer())
+      ));
+    }
+  }
+
+  private static class OrderCannotBeUpdatedException extends Throwable {
+    public OrderCannotBeUpdatedException(String cannotUpdateACancelledOrder) {
+    }
+  }
 }

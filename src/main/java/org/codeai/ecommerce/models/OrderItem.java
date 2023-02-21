@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
@@ -28,6 +29,7 @@ public class OrderItem {
     @ToString.Exclude
     private Order order;
 
+    @Column(nullable = false)
     private int quantity;
 
   public OrderItem(Product productById, Integer quantity) {
@@ -36,9 +38,6 @@ public class OrderItem {
   }
 
 
-  // constructors, getters, and setters
-
-    // ...
 
   @Override
   public boolean equals(Object o) {
@@ -51,5 +50,14 @@ public class OrderItem {
   @Override
   public int hashCode() {
     return getClass().hashCode();
+  }
+
+
+  public Long getProductId() {
+    return this.product.getId().toString();
+  }
+
+  public BigDecimal getPrice() {
+    return this.product.getPrice();
   }
 }

@@ -8,61 +8,42 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig  {
 
+  private final UserDetailsService userDetailsService;
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http, RememberMeServices rememberMeServices) throws Exception {
-    return http
-      .authorizeHttpRequests(authorizeRequests ->
+  protected void configure(HttpSecurity http) throws Exception {
+    http.authorizeHttpRequests(authorizeRequests ->
         authorizeRequests
-          .requestMatchers("/admin/**").hasRole("ADMIN")
-          .requestMatchers("/customer/**").hasRole("CUSTOMER")
+          .requestMatchers("/api/admin/").hasRole("ADMIN")
+          .requestMatchers("/api/customer/").hasRole("CUSTOMER")
+          .requestMatchers("/api/**").permitAll()
           .requestMatchers("/").permitAll()
           .anyRequest().authenticated()
       )
-      .formLogin(withDefaults())
-      .rememberMe(rememberMe -> rememberMe
-        .rememberMeServices(rememberMeServices)
-      )
-      .build();
+      .formLogin()
+      .and()
+      .rememberMe()
+      .rememberMeServices(rememberMeServices());
 
   }
 
   @Bean
-  DefaultSecurityFilterChain springSecurity(HttpSecurity http) throws Exception {
-    HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
-    requestCache.setMatchingRequestParameterName("continue");
-    http
-      // ...
-      .requestCache((cache) -> cache
-        .requestCache(requestCache)
-      );
-    return http.build();
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
   }
 
-    @Bean
-    public PasswordEncoder passwordEncoder () {
-      return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    RememberMeServices rememberMeServices (UserDetailsService userDetailsService){
-      TokenBasedRememberMeServices.RememberMeTokenAlgorithm encodingAlgorithm = TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256;
-      String myKey = userDetailsService.getClass().getName();
-      TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices(myKey, userDetailsService, encodingAlgorithm);
-      rememberMe.setMatchingAlgorithm(TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256);
-      return rememberMe;
-    }
+  @Bean
+  public RememberMeServices rememberMeServices() {
+    TokenBasedRememberMeServices rememberMeServices = new TokenBasedRememberMeServices("myKey", userDetailsService);
+    rememberMeServices.setTokenValiditySeconds(3600); // 1 hour
+    return rememberMeServices;
   }
+
+}

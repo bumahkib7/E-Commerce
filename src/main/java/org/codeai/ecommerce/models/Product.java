@@ -20,7 +20,7 @@ public class Product {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "product_id", nullable = false, updatable = false)
-  public final long serialVersion = 23L;
+  public Long id;
 
   @Column(nullable = false)
   private String name;
@@ -61,8 +61,8 @@ public class Product {
     if (this == o) return true;
     if (!(o instanceof Product product)) return false;
 
-    if (getSerialVersion() != product.getSerialVersion()) return false;
     if (getQuantity() != product.getQuantity()) return false;
+    if (getId() != null ? !getId().equals(product.getId()) : product.getId() != null) return false;
     if (getName() != null ? !getName().equals(product.getName()) : product.getName() != null) return false;
     if (getDescription() != null ? !getDescription().equals(product.getDescription()) : product.getDescription() != null)
       return false;
@@ -75,21 +75,21 @@ public class Product {
 
   @Override
   public int hashCode() {
-    int result = (int) (getSerialVersion() ^ (getSerialVersion() >>> 32));
-    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-    result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
-    result = 31 * result + (getPrice() != null ? getPrice().hashCode() : 0);
+    int result = getId().hashCode();
+    result = 31 * result + getName().hashCode();
+    result = 31 * result + getDescription().hashCode();
+    result = 31 * result + getPrice().hashCode();
     result = 31 * result + getQuantity();
-    result = 31 * result + (getImage() != null ? getImage().hashCode() : 0);
-    result = 31 * result + (getCategory() != null ? getCategory().hashCode() : 0);
-    result = 31 * result + (getOrder() != null ? getOrder().hashCode() : 0);
+    result = 31 * result + getImage().hashCode();
+    result = 31 * result + getCategory().hashCode();
+    result = 31 * result + getOrder().hashCode();
     return result;
   }
 
   @Override
   public String toString() {
     return "Product{" +
-      "serialVersion=" + serialVersion +
+      "id=" + id +
       ", name='" + name + '\'' +
       ", description='" + description + '\'' +
       ", price=" + price +
@@ -98,5 +98,14 @@ public class Product {
       ", category='" + category + '\'' +
       ", order=" + order +
       '}';
+  }
+
+  public boolean isAvailable() {
+    return quantity > 0;
+  }
+
+
+  public  int getStock() {
+    return quantity;
   }
 }
