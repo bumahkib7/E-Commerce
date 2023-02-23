@@ -55,7 +55,7 @@ public class Order {
 
   @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
   @ToString.Exclude
-  private List<OrderItem> orderItems = new ArrayList<>();
+  private List<OrderItems> orderItems = new ArrayList<>();
   @Enumerated(EnumType.STRING)
   private OrderStatus orderStatus;
 
@@ -65,14 +65,16 @@ public class Order {
     inverseJoinColumns = @JoinColumn(name = "shipping_address_id"))
   private ShippingAddress shippingAddress;
 
-  public Order(Customer customer, List<OrderItem> orderItems, BigDecimal totalPrice) {
+  public Order(Customer customer, List<OrderItems> orderItems, BigDecimal totalPrice) {
     this.customer = customer;
     this.orderItems = orderItems;
     this.total = totalPrice;
   }
 
 
-  @Override
+
+
+    @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;

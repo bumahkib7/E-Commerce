@@ -5,7 +5,7 @@ import org.codeai.ecommerce.Enums.OrderStatus;
 import org.codeai.ecommerce.exceptions.OrderNotFoundException;
 import org.codeai.ecommerce.exceptions.OrderValidationException;
 import org.codeai.ecommerce.models.Order;
-import org.codeai.ecommerce.models.OrderItem;
+import org.codeai.ecommerce.models.OrderItems;
 import org.codeai.ecommerce.models.Product;
 import org.codeai.ecommerce.repository.OrderRepository;
 import org.codeai.ecommerce.requests.OrderRequest;
@@ -53,9 +53,14 @@ public class OrderService {
       })
       .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    List<OrderItem> orderItems = orderRequest.orderItems().stream()
-      .map(orderItemRequest -> new OrderItem(productService.getProductById(orderItemRequest.productId()), orderItemRequest.quantity()))
+    List<OrderItems> orderItems = orderRequest.orderItems().stream()
+      .map(orderItemRequest -> {
+        Product product = productService.getProductById(orderItemRequest.productId());
+        int quantity = orderItemRequest.quantity();
+        return new OrderItems(product, quantity);
+      })
       .collect(Collectors.toList());
+
 
     Order order = new Order(orderRequest.customer(), orderItems, totalPrice);
     validateOrder(order);
@@ -112,8 +117,8 @@ public class OrderService {
     if (!validator.isValid(order)) {
       throw new OrderValidationException(validator.getErrors(
         order.getOrderItems().stream()
-          .map(OrderItem::getProduct)
-          .collect(Collectors.toList()).add(order.getCustomer())
+          .map(OrderItems::getProduct)
+          .toList().toArray()
       ));
     }
   }
