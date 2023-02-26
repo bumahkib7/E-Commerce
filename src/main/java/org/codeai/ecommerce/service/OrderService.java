@@ -10,6 +10,7 @@ import org.codeai.ecommerce.models.Product;
 import org.codeai.ecommerce.repository.OrderRepository;
 import org.codeai.ecommerce.requests.OrderRequest;
 import org.codeai.ecommerce.validator.OrderValidator;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -29,8 +30,7 @@ public class OrderService {
     this.productService = productService;
   }
 
-  @SneakyThrows(OrderValidationException.class)
-  public Order createOrder(OrderRequest orderRequest) {
+  public Order createOrder(@NotNull OrderRequest orderRequest) {
     BigDecimal totalPrice = orderRequest.orderItems().stream()
       .map(orderItemRequest -> {
         Product product = productService.getProductById(orderItemRequest.productId());
@@ -67,7 +67,6 @@ public class OrderService {
     return orderRepository.save(order);
   }
 
-  @SneakyThrows(OrderValidationException.class)
   public Order updateOrder(Order order) {
     validateOrder(order);
     return orderRepository.save(order);
@@ -79,7 +78,6 @@ public class OrderService {
     }
   }
 
-  @SneakyThrows(OrderValidationException.class)
   public Order getOrder(Long id) {
     validateOrder(orderRepository.findById(id).orElse(null));
     return orderRepository.findById(id).orElse(null);
@@ -90,7 +88,6 @@ public class OrderService {
     return orderRepository.findAll();
   }
 
-  @SneakyThrows(OrderValidationException.class)
   public Order getOrderById(Long id) {
     validateOrder(orderRepository.findById(id).orElse(null));
     return orderRepository.findById(id).orElse(null);

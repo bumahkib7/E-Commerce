@@ -12,6 +12,13 @@ public class UserValidator {
     }
   }
 
+  public void validateUserAlreadyExists(User user) {
+    // validate user
+    if (user.getId() != null) {
+      throw new UserValidationException("User already exists");
+    }
+  }
+
   public boolean isValid(User user) {
     return user.getId() != null;
   }

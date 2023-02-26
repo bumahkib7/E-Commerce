@@ -16,6 +16,9 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
+@NamedQueries({
+  @NamedQuery(name = "User.existsById", query = "select (count(u) > 0) from User u where u.id = ?1", lockMode = LockModeType.PESSIMISTIC_FORCE_INCREMENT)
+})
 @Getter
 @Setter
 @ToString

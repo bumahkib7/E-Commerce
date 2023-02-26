@@ -1,348 +1,41 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: e-commerce
+  name: ecommerce-deployment
   labels:
-    app: e-commerce
+    app: ecommerce
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: e-commerce
+      app: ecommerce
   template:
     metadata:
       labels:
-        app: e-commerce
+        app: ecommerce
     spec:
       containers:
-        - name: e-commerce
-          image: e-commerce:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8080
-          env:
-            - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
-              value: org.postgresql.Driver
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://rogue.db.elephantsql.com:5432/wnzeizcm
-            - name: SPRING_DATASOURCE_USERNAME
-              value: wnzeizcm
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: cpOAtficojyQYV676D8SK8V_RleuUwUA
-            - name: SPRING_DATASOURCE_HIKARI_AUTO_COMMIT
-              value: "true"
-            - name: SPRING_DATASOURCE_GENERATE_UNIQUE_NAME
-              value: "true"
-            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-              value: update
-            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
-              value: org.hibernate.dialect.PostgreSQLDialect
-            - name: SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION
-              value: "true"
-            - name: SPRING_JPA_SHOW_SQL
-              value: "true"
-            - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
-              value: "true"
-            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-              value: https://idp.example.com/auth/realms/example
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-apiVersion: v1
+      - name: ecommerce
+        image: your-image:tag
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DATABASE_URL
+          value: jdbc:mysql://mysql-db:3306/ecommerce_db?useSSL=false
+        - name: DATABASE_USERNAME
+          value: your-username
+        - name: DATABASE_PASSWORD
+          value: your-password
+---
+apiVersion: admissionregistration.k8s.io/v1
 kind: Service
 metadata:
-  name: e-commerce-service
+  name: ecommerce-service
 spec:
   selector:
-    app: e-commerce
+    app: ecommerce
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
+  - name: http
+    port: 80
+    targetPort: 8080
+  type: LoadBalancer

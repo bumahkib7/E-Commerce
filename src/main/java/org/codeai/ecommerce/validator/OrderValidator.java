@@ -4,7 +4,7 @@ import ch.qos.logback.core.helpers.CyclicBuffer;
 import com.nimbusds.oauth2.sdk.util.StringUtils;
 import org.codeai.ecommerce.Enums.OrderStatus;
 import org.codeai.ecommerce.models.Order;
-import org.codeai.ecommerce.models.OrderItem;
+import org.codeai.ecommerce.models.OrderItems;
 import org.codeai.ecommerce.models.Product;
 import org.codeai.ecommerce.models.ShippingAddress;
 import org.codeai.ecommerce.service.ProductService;
@@ -48,7 +48,7 @@ public class OrderValidator {
   }
 
   private void validateProducts(Order order) {
-    for (OrderItem item : order.getOrderItems()) {
+    for (OrderItems item : order.getOrderItems()) {
       Product product = productService.getProductById(item.getProductId());
       if (product == null) {
         errors.add("Product with ID " + item.getProductId() + " does not exist");
@@ -99,9 +99,7 @@ public class OrderValidator {
     return false;
   }
 
-  public String getErrors() {
 
-  }
 
   public String getErrors(Object[] toArray) {
     return null;

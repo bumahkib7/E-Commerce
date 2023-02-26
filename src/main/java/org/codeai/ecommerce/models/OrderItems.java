@@ -1,7 +1,10 @@
 package org.codeai.ecommerce.models;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.Hibernate;
 
 import java.math.BigDecimal;
@@ -20,11 +23,10 @@ public class OrderItems {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "product_id")
   @ToString.Exclude
   private Product product;
-
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id")
   @ToString.Exclude
@@ -33,18 +35,24 @@ public class OrderItems {
   @Column(nullable = false)
   private int quantity;
 
+  @Column(nullable = false)
+  private BigDecimal price;
+  private Long orderId;
+
   public OrderItems(Product productById, Integer quantity) {
     this.product = productById;
     this.quantity = quantity;
   }
 
 
+
+
   public Long getProductId() {
-    return this.product.getId();
+    return this.getId();
   }
 
   public BigDecimal getPrice() {
-    return this.product.getPrice();
+    return this.price;
   }
 
 
@@ -59,5 +67,13 @@ public class OrderItems {
   @Override
   public int hashCode() {
     return getClass().hashCode();
+  }
+
+  public void setProductId(Long productId) {
+    this.id = productId;
+  }
+
+  public void setOrderId(Long orderId) {
+    this.orderId = orderId;
   }
 }

@@ -1,17 +1,22 @@
 package org.codeai.ecommerce.service;
 
+import org.codeai.ecommerce.exceptions.UserValidationException;
 import org.codeai.ecommerce.models.User;
 import org.codeai.ecommerce.repository.UserRepository;
+import org.codeai.ecommerce.requests.LoginRequest;
 import org.codeai.ecommerce.validator.UserValidator;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.logging.Logger;
+
 @Service
 public class UserService implements UserDetailsService {
 
   private final UserRepository userRepository;
+  private final Logger logger = Logger.getLogger(UserService.class.getName());
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
@@ -45,6 +50,10 @@ public class UserService implements UserDetailsService {
     return user;
   }
 
+  public User login(LoginRequest loginRequest) {
+    return (User) userRepository.findByUsernameAndPassword(loginRequest.username(), loginRequest.password())
+      .orElse(null);
+  }
 
   public void deleteUser(Long id) {
     if (!userRepository.existsById(id)) {
@@ -55,19 +64,29 @@ public class UserService implements UserDetailsService {
 
 
   public void validateUser(User user) {
-    UserValidator validator = new UserValidator();
-    validator.validate(user);
+    try {
+      UserValidator userValidator = new UserValidator();
+      if (user.getId() != null) {
+        userValidator.validateUserAlreadyExists(user);
+      } else {
+        userValidator.validate(user);
+      }
+    } catch (UserValidationException ignored) {
+      logger.info("User is not valid");
+    }
 
   }
 
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = (User) userRepository.findByUsername(username)
+    User user = userRepository.findByUsername(username)
       .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
     return new org.springframework.security.core.userdetails.User(
       user.getUsername(),
       user.getPassword(),
       user.getAuthorities());
   }
+
+
 }
