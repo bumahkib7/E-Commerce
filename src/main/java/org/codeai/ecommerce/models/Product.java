@@ -42,10 +42,9 @@ public class Product {
   private String category;
 
 
-  @OneToMany
-  @JoinColumn(name = "product_id")
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
   @ToString.Exclude
-  private Set<Order> order;
+  private Set<OrderItems> orderItems;
 
   public Product(String name, BigDecimal newPrice) {
     this.name = Objects.requireNonNull(name);
@@ -71,7 +70,7 @@ public class Product {
     if (getImage() != null ? !getImage().equals(product.getImage()) : product.getImage() != null) return false;
     if (getCategory() != null ? !getCategory().equals(product.getCategory()) : product.getCategory() != null)
       return false;
-    return getOrder() != null ? getOrder().equals(product.getOrder()) : product.getOrder() == null;
+    return getOrderItems() != null ? getOrderItems().equals(product.getOrderItems()) : product.getOrderItems() == null;
   }
 
   @Override
@@ -83,7 +82,7 @@ public class Product {
     result = 31 * result + getQuantity();
     result = 31 * result + getImage().hashCode();
     result = 31 * result + getCategory().hashCode();
-    result = 31 * result + getOrder().hashCode();
+    result = 31 * result + getOrderItems().hashCode();
     return result;
   }
 
@@ -97,7 +96,7 @@ public class Product {
       ", quantity=" + quantity +
       ", image='" + image + '\'' +
       ", category='" + category + '\'' +
-      ", order=" + order +
+      ", order Items=" + orderItems +
       '}';
   }
 

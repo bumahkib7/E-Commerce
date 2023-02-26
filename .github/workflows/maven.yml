@@ -1,4 +1,4 @@
- 
+
 name: Java CI with Maven
 
 on:
@@ -22,5 +22,15 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Run tests
       run: mvn test --file pom.xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+      token: ${{ secrets.CODECOV_TOKEN }}
+      file: ./target/site/jacoco/jacoco.xml
+      flags: unittests
+
+    - name: codecov-umbrella
+    - fail_ci_if_error: true
 
 

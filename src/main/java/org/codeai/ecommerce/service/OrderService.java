@@ -31,7 +31,7 @@ public class OrderService {
   }
 
   public Order createOrder(@NotNull OrderRequest orderRequest) {
-    BigDecimal totalPrice = orderRequest.orderItems().stream()
+    BigDecimal total = orderRequest.orderItems().stream()
       .map(orderItemRequest -> {
         Product product = productService.getProductById(orderItemRequest.productId());
         int quantity = orderItemRequest.quantity();
@@ -61,10 +61,12 @@ public class OrderService {
       })
       .collect(Collectors.toList());
 
-
-    Order order = new Order(orderRequest.customer(), orderItems, totalPrice);
+    Order order = new Order(orderRequest.customer(), orderItems, total, orderRequest.paymentMethod(),
+      orderRequest.shippingMethod(), orderRequest.shippingAddress());
     validateOrder(order);
     return orderRepository.save(order);
+
+
   }
 
   public Order updateOrder(Order order) {

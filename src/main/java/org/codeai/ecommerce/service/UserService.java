@@ -62,6 +62,9 @@ public class UserService implements UserDetailsService {
     userRepository.deleteById(id);
   }
 
+  public boolean isUserExists(User user) {
+    return userRepository.IsExists(user);
+  }
 
   public void validateUser(User user) {
     try {

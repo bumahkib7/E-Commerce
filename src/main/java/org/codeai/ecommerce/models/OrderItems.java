@@ -37,7 +37,7 @@ public class OrderItems {
 
   @Column(nullable = false)
   private BigDecimal price;
-  private Long orderId;
+
 
   public OrderItems(Product productById, Integer quantity) {
     this.product = productById;
@@ -73,7 +73,5 @@ public class OrderItems {
     this.id = productId;
   }
 
-  public void setOrderId(Long orderId) {
-    this.orderId = orderId;
-  }
+
 }

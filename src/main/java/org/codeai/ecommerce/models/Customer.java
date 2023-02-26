@@ -17,8 +17,8 @@ public class Customer {
 
 
   @OneToOne(cascade = CascadeType.ALL,
-          fetch = FetchType.LAZY,
-          optional = false)
+    fetch = FetchType.LAZY,
+    optional = false)
   @JoinColumn(name = "user_id")
   private User user;
 
