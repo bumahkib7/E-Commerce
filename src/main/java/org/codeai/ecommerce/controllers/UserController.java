@@ -32,7 +32,7 @@ public class UserController {
   @PostMapping("/register")
   public ResponseEntity<?> register(User user) {
     log.info("Registering user: {}", user);
-    User registeringUser = userService.createUser(user);
+    Long registeringUser = userService.createUser(user);
 
     boolean isExists = userService.isUserExists(registeringUser);
     log.info("Checking if user exists: {}", isExists);

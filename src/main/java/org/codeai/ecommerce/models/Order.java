@@ -6,8 +6,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.codeai.ecommerce.Enums.OrderStatus;
+import org.codeai.ecommerce.Enums.TransactionStatus;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.NumberFormat;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,7 +36,8 @@ public class Order {
 
 
   @Column(nullable = false)
-  private Date date;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private ZonedDateTime orderDate;
 
   @Column(nullable = false)
   private BigDecimal total;
@@ -48,7 +53,8 @@ public class Order {
   private PaymentMethod paymentMethod;
 
   @Column(nullable = false)
-  private String paymentStatus;
+  @Enumerated(EnumType.STRING)
+  private TransactionStatus paymentStatus;
 
   @Column(nullable = false)
   private String shippingMethod;
@@ -66,17 +72,23 @@ public class Order {
     inverseJoinColumns = @JoinColumn(name = "shipping_address_id"))
   private ShippingAddress shippingAddress;
 
-  public Order(Customer customer, List<OrderItems> orderItems, BigDecimal total, PaymentMethod paymentMethod, String shippingMethod, ShippingAddress shippingAddress) {
+  public Order(Customer customer,
+               List<OrderItems> orderItems,
+               BigDecimal total,
+               PaymentMethod paymentMethod,
+               String shippingMethod,
+               ShippingAddress shippingAddress
+               ) {
     this.customer = customer;
     this.orderItems = orderItems;
     this.total = total;
     this.quantity = orderItems.stream().mapToInt(OrderItems::getQuantity).sum();
     this.status = OrderStatus.PENDING;
     this.paymentMethod = paymentMethod;
-    this.paymentStatus = String.valueOf(OrderStatus.AWAITING_PAYMENT);
+    this.paymentStatus = TransactionStatus.PENDING;
     this.shippingMethod = shippingMethod;
     this.shippingAddress = shippingAddress;
-    this.date = new Date();
+    this.orderDate = ZonedDateTime.now();
   }
 
   public void addOrderItem(OrderItems orderItem) {
@@ -102,37 +114,6 @@ public class Order {
     this.id = id;
   }
 
-  public Customer getCustomer() {
-    return customer;
-  }
-
-  public void setCustomer(Customer customer) {
-    this.customer = customer;
-  }
-
-  public Date getDate() {
-    return date;
-  }
-
-  public void setDate(Date date) {
-    this.date = date;
-  }
-
-  public BigDecimal getTotal() {
-    return total;
-  }
-
-  public void setTotal(BigDecimal total) {
-    this.total = total;
-  }
-
-  public int getQuantity() {
-    return quantity;
-  }
-
-  public void setQuantity(int quantity) {
-    this.quantity = quantity;
-  }
 
   public OrderStatus getStatus() {
     return status;
@@ -143,35 +124,14 @@ public class Order {
     return orderItems;
   }
 
-  public void setOrderItems(List<OrderItems> orderItems) {
-    this.orderItems.clear();
-    if (orderItems != null) {
-      orderItems.forEach(this::addOrderItem);
-    }
-  }
 
-  public OrderStatus getOrderStatus() {
-    return orderStatus;
-  }
 
-  public void setOrderStatus(OrderStatus orderStatus) {
-    this.orderStatus = orderStatus;
-    this.status = orderStatus;
-  }
-
-  public void setOrderStatus(String orderStatus) {
-    this.orderStatus = OrderStatus.valueOf(orderStatus);
-    this.status = OrderStatus.valueOf(orderStatus);
-  }
 
   public ShippingAddress getShippingAddress() {
     return shippingAddress;
   }
 
-  public void setShippingAddress(ShippingAddress shippingAddress) {
-    this.shippingAddress = shippingAddress;
-    shippingAddress.setOrder(this);
-  }
+
 
 
 }

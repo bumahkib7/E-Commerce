@@ -11,7 +11,7 @@ import lombok.*;
 public class PaymentMethod {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private volatile Long id;
 
 
   @OneToOne
@@ -21,5 +21,6 @@ public class PaymentMethod {
   @OneToOne
   @JoinColumn(name = "mobile_money_payment_id")
   private MobileMoneyPayment mobileMoneyPayment;
+
 
 }

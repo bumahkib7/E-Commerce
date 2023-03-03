@@ -25,10 +25,7 @@ public class Customer {
   @Column(nullable = false)
   private String address;
 
-  public Customer(User user, String address) {
-    this.user = user;
-    this.address = address;
-  }
+
 
   @Override
   public boolean equals(Object o) {

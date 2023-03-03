@@ -16,15 +16,17 @@ import java.util.logging.Logger;
 public class UserService implements UserDetailsService {
 
   private final UserRepository userRepository;
-  private final Logger logger = Logger.getLogger(UserService.class.getName());
+
+  private static  volatile String  MY_LOGGER_NAME = "User.logger";
+  private final Logger logger = Logger.getLogger(MY_LOGGER_NAME,UserService.class.getName());
 
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
   }
 
-  public User createUser(User user) {
+  public Long createUser(User user) {
     validateUser(user);
-    return userRepository.save(user);
+    return userRepository.save(user).getId();
 
   }
 
@@ -62,7 +64,7 @@ public class UserService implements UserDetailsService {
     userRepository.deleteById(id);
   }
 
-  public boolean isUserExists(User user) {
+  public boolean isUserExists(Long user) {
     return userRepository.IsExists(user);
   }
 

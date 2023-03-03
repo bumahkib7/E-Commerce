@@ -1,59 +1,60 @@
 apiVersion: v1
 kind: deployment
 metadata:
-  name: e-commerce
-  labels:
-    app: e-commerce
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: e-commerce
-  template:
-    metadata:
-      labels:
+    name: e-commerce
+    labels:
         app: e-commerce
-    spec:
-      containers:
-        - name: e-commerce
-          image: e-commerce:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8080
-          env:
-            - name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
-              value: org.postgresql.Driver
-            - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://rogue.db.elephantsql.com:5432/wnzeizcm
-            - name: SPRING_DATASOURCE_USERNAME
-              value: wnzeizcm
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: cpOAtficojyQYV676D8SK8V_RleuUwUA
-            - name: SPRING_DATASOURCE_HIKARI_AUTO_COMMIT
-              value: "true"
-            - name: SPRING_DATASOURCE_GENERATE_UNIQUE_NAME
-              value: "true"
-            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
-              value: update
-            - name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
-              value: org.hibernate.dialect.PostgreSQLDialect
-            - name: SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION
-              value: "true"
-            - name: SPRING_JPA_SHOW_SQL
-              value: "true"
-            - name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
-              value: "true"
-            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
-              value: https://idp.example.com/auth/realms/example
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: e-commerce
+    template:
+        metadata:
+            labels:
+                app: e-commerce
+        spec:
+            containers:
+                -   name: e-commerce
+                    image: e-commerce:latest
+                    imagePullPolicy: Always
+                    ports:
+                        -   containerPort: 8080
+                    env:
+                        -   name: SPRING_DATASOURCE_DRIVER_CLASS_NAME
+                            value: org.postgresql.Driver
+                        -   name: SPRING_DATASOURCE_URL
+                            value: jdbc:postgresql://rogue.db.elephantsql.com:5432/wnzeizcm
+                        -   name: SPRING_DATASOURCE_USERNAME
+                            value: wnzeizcm
+                        -   name: SPRING_DATASOURCE_PASSWORD
+                            value: cpOAtficojyQYV676D8SK8V_RleuUwUA
+                        -   name: SPRING_DATASOURCE_HIKARI_AUTO_COMMIT
+                            value: "true"
+                        -   name: SPRING_DATASOURCE_GENERATE_UNIQUE_NAME
+                            value: "true"
+                        -   name: SPRING_JPA_HIBERNATE_DDL_AUTO
+                            value: update
+                        -   name: SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT
+                            value: org.hibernate.dialect.PostgreSQLDialect
+                        -   name: SPRING_JPA_PROPERTIES_HIBERNATE_JDBC_LOB_NON_CONTEXTUAL_CREATION
+                            value: "true"
+                        -   name: SPRING_JPA_SHOW_SQL
+                            value: "true"
+                        -   name: SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL
+                            value: "true"
+                        -   name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+                            value: https://idp.example.com/auth/realms/example
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: e-commerce-service
+    name: e-commerce-service
 spec:
-  selector:
-    app: e-commerce
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
+    selector:
+        app: e-commerce
+    ports:
+        -   protocol: TCP
+            port: 8080
+            targetPort: 8080
+    <

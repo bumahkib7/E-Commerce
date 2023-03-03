@@ -12,7 +12,7 @@ public record OrderRequest(Customer customer,
                            List<OrderItemRequest> orderItems,
 
                            BigDecimal total,
-                           PaymentMethod paymentMethod,
+                           PaymentRequest paymentRequest,
                            String shippingMethod,
                            ShippingAddress shippingAddress) {
 }

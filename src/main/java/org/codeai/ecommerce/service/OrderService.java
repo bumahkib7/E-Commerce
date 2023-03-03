@@ -1,14 +1,16 @@
 package org.codeai.ecommerce.service;
 
+import jakarta.transaction.Transactional;
 import lombok.SneakyThrows;
 import org.codeai.ecommerce.Enums.OrderStatus;
+import org.codeai.ecommerce.Enums.TransactionStatus;
 import org.codeai.ecommerce.exceptions.OrderNotFoundException;
 import org.codeai.ecommerce.exceptions.OrderValidationException;
-import org.codeai.ecommerce.models.Order;
-import org.codeai.ecommerce.models.OrderItems;
-import org.codeai.ecommerce.models.Product;
+import org.codeai.ecommerce.models.*;
 import org.codeai.ecommerce.repository.OrderRepository;
+import org.codeai.ecommerce.repository.PaymentMethodRepository;
 import org.codeai.ecommerce.requests.OrderRequest;
+import org.codeai.ecommerce.requests.PaymentRequest;
 import org.codeai.ecommerce.validator.OrderValidator;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,15 @@ public class OrderService {
   private final OrderRepository orderRepository;
   private final ProductService productService;
 
+  private final OrderItemSerivces orderItemSerivces;
+  private final PaymentMethodRepository paymentMethodRepository;
 
-  public OrderService(OrderRepository orderRepository, ProductService productService) {
+  public OrderService(OrderRepository orderRepository, ProductService productService, OrderItemSerivces orderItemSerivces,
+                      PaymentMethodRepository paymentMethodRepository) {
     this.orderRepository = orderRepository;
     this.productService = productService;
+    this.orderItemSerivces = orderItemSerivces;
+    this.paymentMethodRepository = paymentMethodRepository;
   }
 
   public Order createOrder(@NotNull OrderRequest orderRequest) {
@@ -66,10 +73,36 @@ public class OrderService {
     validateOrder(order);
     return orderRepository.save(order);
 
-
   }
 
-  public Order updateOrder(Order order) {
+
+  @Transactional
+  public Order createOrderV2(Customer customer, List<OrderItems> orderItems, PaymentMethod paymentMethod, String shippingMethod, String shippingAddress) {
+    List <OrderItems> orderItemsList = orderItems.stream().map(orderItem -> {
+      Product product = productService.getProductById(orderItem.getProductId());
+      int quantity = orderItem.getQuantity();
+      return new OrderItems(product, quantity);
+    }).toList();
+
+     BigDecimal total = orderItemsList.stream().map(OrderItems::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+     //now create a payment method variable and and if it is mobile money then create a payment request else if it is card then create a payment request
+    //else set paymentstatus to Pending
+    PaymentMethod paymentMethod1 = paymentMethodRepository.findById(paymentMethod.getId()).orElse(null);
+    PaymentRequest paymentRequest = null;
+
+    if (Objects.equals(Objects.requireNonNull(paymentMethod1).getMobileMoneyPayment(), "Mobile Money")) {
+      paymentRequest = new PaymentRequest(paymentMethod1, TransactionStatus.PENDING, total);
+    } else if (paymentMethod1.getName().equals("Card")) {
+      paymentRequest = new PaymentRequest(paymentMethod1, TransactionStatus.PENDING, total);
+    } else {
+      paymentRequest = new PaymentRequest(paymentMethod1, TransactionStatus.PENDING, total);
+    }
+
+    // Create order
+
+  }
+public Order updateOrder(Order order) {
     validateOrder(order);
     return orderRepository.save(order);
   }
@@ -111,8 +144,8 @@ public class OrderService {
     OrderValidator validator = new OrderValidator(
       (ProductService) orderRepository.findAll().stream()
         .filter(o -> !Objects.equals(o.getId(), order.getId()))
-        .collect(Collectors.toList())
-    );
+        .collect(Collectors.toList()),
+        errors);
     if (!validator.isValid(order)) {
       throw new OrderValidationException(validator.getErrors(
         order.getOrderItems().stream()
